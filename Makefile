@@ -92,7 +92,5 @@ publish-dist: dist
 			--title "$(MCP_DIST_TITLE)" \
 			--notes "$(MCP_DIST_NOTES)"; \
 	fi
-	@artifacts="$$(find "$(DIST_DIR)" -maxdepth 1 -type f \( -name 'timich-mcp_$(TIMICH_MCP_VERSION)_*_*.tar.gz' -o -name 'timich-mcp_$(TIMICH_MCP_VERSION)_*_*.tar.gz.sha256' \) | sort)" && \
-		if [ -z "$$artifacts" ]; then echo "No MCP release artifacts found for $(TIMICH_MCP_VERSION) in $(DIST_DIR)."; exit 1; fi && \
-		gh release upload "$(MCP_DIST_TAG)" $$artifacts --repo "$(MCP_DIST_REPO)" --clobber
+	@gh release upload "$(MCP_DIST_TAG)" "$(DIST_ARCHIVE)" "$(DIST_ARCHIVE).sha256" --repo "$(MCP_DIST_REPO)" --clobber
 	@echo "Published MCP artifacts to $(MCP_DIST_REPO) $(MCP_DIST_TAG)"

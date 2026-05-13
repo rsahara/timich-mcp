@@ -43,6 +43,9 @@ Last Updated: 2026-05-14
 - 2026-05-14 (Session: release target alignment): Updated the release workflow branch to use the Makefile `dist` target instead of a separate public-repo release builder script.
   - Outcome: The public workflow now builds each release platform by calling `make dist`, matching the monorepo source-defined release packaging.
   - References: Release workflow, Makefile release target.
+- 2026-05-14 (Session: publish artifact review): Scoped the Makefile publish target to the artifact created by the current publish invocation.
+  - Outcome: `publish-dist` no longer uploads every same-version artifact already present in the output directory.
+  - References: Makefile release target, release publishing.
 
 ### Lessons Learned
 - Pattern to repeat: Compare repository policy through GitHub API before changing branch protection.
@@ -51,6 +54,7 @@ Last Updated: 2026-05-14
 - Pitfall to avoid: Adding approval or status-check requirements when the request only asks to block direct pushes.
 - Pitfall to avoid: Copying Linux-only release targets from the agent repository when the MCP binary is installed on client machines.
 - Pitfall to avoid: Letting public repository-only release scripts drift from the monorepo source of truth.
+- Pitfall to avoid: Uploading stale same-version release artifacts from the output directory without manifest-style validation.
 - Prevention checklist: Verify the resulting protection JSON after updating.
 - Prevention checklist: Run the PR verify script and at least one release artifact build before handoff.
 
