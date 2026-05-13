@@ -1,0 +1,136 @@
+name: Release Timich MCP
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Stable release version. Use 0.1.0 or v0.1.0.
+        required: true
+        type: string
+      draft:
+        description: Create or keep the GitHub Release as a draft.
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish release
+    if: ${{ github.event_name == 'push' || github.ref_name == 'main' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: ./.github/actions/setup-go
+
+      - name: Verify
+        run: scripts/ci/verify.sh
+
+      - name: Resolve release inputs
+        id: release
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_DRAFT: ${{ inputs.draft }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "push" ]; then
+            raw_version="$REF_NAME"
+            draft="false"
+          else
+            raw_version="$INPUT_VERSION"
+            draft="$INPUT_DRAFT"
+          fi
+
+          version="${raw_version#v}"
+          if ! [[ "$version" =~ ^[0-9]+[.][0-9]+[.][0-9]+$ ]]; then
+            echo "::error::stable release version must look like 0.1.0 or v0.1.0"
+            exit 1
+          fi
+
+          {
+            echo "version=$version"
+            echo "tag=v$version"
+            echo "draft=$draft"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build release artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          for platform in \
+            linux/amd64 \
+            linux/arm64 \
+            darwin/amd64 \
+            darwin/arm64 \
+            windows/amd64
+          do
+            make dist \
+              TIMICH_MCP_VERSION="${{ steps.release.outputs.version }}" \
+              DIST_OS="${platform%/*}" \
+              DIST_ARCH="${platform#*/}"
+          done
+
+      - name: Write release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > release-notes.md <<NOTES
+          Timich MCP ${{ steps.release.outputs.version }} release artifacts.
+
+          Artifacts:
+          - Linux amd64, Linux arm64, macOS amd64, macOS arm64, and Windows amd64 bundles
+          - SHA256 checksum files for each bundle
+          NOTES
+
+      - name: Create or update GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_TITLE: Timich MCP ${{ steps.release.outputs.version }}
+          RELEASE_DRAFT: ${{ steps.release.outputs.draft }}
+          RELEASE_TARGET: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          release_args=(
+            --title "$RELEASE_TITLE"
+            --notes-file release-notes.md
+            --target "$RELEASE_TARGET"
+          )
+          release_edit_args=(
+            --title "$RELEASE_TITLE"
+            --notes-file release-notes.md
+            --draft="$RELEASE_DRAFT"
+            --prerelease=false
+          )
+          if [ "$RELEASE_DRAFT" = "true" ]; then
+            release_args+=(--draft)
+          fi
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" "${release_edit_args[@]}"
+            gh release upload "$RELEASE_TAG" dist/* --clobber
+          else
+            gh release create "$RELEASE_TAG" dist/* "${release_args[@]}"
+          fi
