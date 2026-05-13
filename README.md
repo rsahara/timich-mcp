@@ -164,3 +164,19 @@ You can also run the server directly:
 ```sh
 go run ./cmd/timich-mcp serve
 ```
+
+## Release
+
+Pull requests to `main` run the repository verification script:
+
+```sh
+scripts/ci/verify.sh
+```
+
+Release bundles are published by the GitHub Actions release workflow when a
+`v*` tag is pushed, or when the workflow is run manually with a stable version.
+To build the same artifacts locally:
+
+```sh
+scripts/release/build-mcp-release.sh --version 0.1.0 --output dist
+```
