@@ -177,20 +177,12 @@ You can also run the server directly:
 go run ./cmd/timich-mcp serve
 ```
 
-## Release
+## Contributing and Security
 
-Pull requests to `main` run the repository verification script:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup and pull request
+guidance. Please report vulnerabilities through the private process described
+in [SECURITY.md](SECURITY.md).
 
-```sh
-scripts/ci/verify.sh
-```
+## License
 
-Release bundles are published by the GitHub Actions release workflow when a
-`v*` tag is pushed, or when the workflow is run manually with a stable version.
-To build the same artifacts locally:
-
-```sh
-for platform in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64; do
-  make dist TIMICH_MCP_VERSION=0.1.0 DIST_OS="${platform%/*}" DIST_ARCH="${platform#*/}"
-done
-```
+Timich MCP is released under the [MIT License](LICENSE).
