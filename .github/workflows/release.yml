@@ -76,9 +76,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          scripts/release/build-mcp-release.sh \
-            --version "${{ steps.release.outputs.version }}" \
-            --output dist
+          rm -rf dist
+          for platform in \
+            linux/amd64 \
+            linux/arm64 \
+            darwin/amd64 \
+            darwin/arm64 \
+            windows/amd64
+          do
+            make dist \
+              TIMICH_MCP_VERSION="${{ steps.release.outputs.version }}" \
+              DIST_OS="${platform%/*}" \
+              DIST_ARCH="${platform#*/}"
+          done
 
       - name: Write release notes
         shell: bash

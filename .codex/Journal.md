@@ -25,9 +25,9 @@ Last Updated: 2026-05-14
   - References: Repository branch protection policy.
 - Decision: Mirror the companion repository's GitHub Actions shape for PR verification and releases.
   - Context: The repository had no workflow automation, while install docs already referred to GitHub Releases.
-  - Choice: Add a PR workflow that runs the shared verify script, plus a tag/manual release workflow that builds platform bundles and checksum files.
-  - Alternatives: Inline all CI commands in workflow YAML or publish a single host-platform binary.
-  - Tradeoffs: Dedicated scripts are locally testable and keep workflow YAML small, while release bundles cover common MCP client platforms.
+  - Choice: Add a PR workflow that runs the shared verify script, plus a tag/manual release workflow that builds platform bundles and checksum files using the source-defined Makefile release target.
+  - Alternatives: Inline all CI commands in workflow YAML, keep a public-repo-only release builder script, or publish a single host-platform binary.
+  - Tradeoffs: Calling `make dist` keeps the public workflow aligned with the monorepo source-of-truth artifact shape, while the workflow still owns the platform matrix and GitHub Release publishing.
   - References: Pull request verification and release publishing.
 
 ### Journey Log
@@ -40,12 +40,17 @@ Last Updated: 2026-05-14
 - 2026-05-14 (Session: PR handoff): Prepared the CI and release workflow changes for pull request review.
   - Outcome: Verification passed locally before branch push and PR creation.
   - References: Pull request branch for workflow automation.
+- 2026-05-14 (Session: release target alignment): Updated the release workflow branch to use the Makefile `dist` target instead of a separate public-repo release builder script.
+  - Outcome: The public workflow now builds each release platform by calling `make dist`, matching the monorepo source-defined release packaging.
+  - References: Release workflow, Makefile release target.
 
 ### Lessons Learned
 - Pattern to repeat: Compare repository policy through GitHub API before changing branch protection.
 - Pattern to repeat: Keep CI logic in scripts that can run both locally and in GitHub Actions.
+- Pattern to repeat: Keep artifact layout in Make targets that can be source-synced from the Timich monorepo.
 - Pitfall to avoid: Adding approval or status-check requirements when the request only asks to block direct pushes.
 - Pitfall to avoid: Copying Linux-only release targets from the agent repository when the MCP binary is installed on client machines.
+- Pitfall to avoid: Letting public repository-only release scripts drift from the monorepo source of truth.
 - Prevention checklist: Verify the resulting protection JSON after updating.
 - Prevention checklist: Run the PR verify script and at least one release artifact build before handoff.
 

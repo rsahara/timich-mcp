@@ -159,6 +159,18 @@ make build
 ./build/timich-mcp version
 ```
 
+Build a release bundle for the current platform:
+
+```sh
+make dist TIMICH_MCP_VERSION=0.1.0
+```
+
+Or build for a specific platform:
+
+```sh
+make dist TIMICH_MCP_VERSION=0.1.0 DIST_OS=linux DIST_ARCH=arm64
+```
+
 You can also run the server directly:
 
 ```sh
@@ -178,5 +190,7 @@ Release bundles are published by the GitHub Actions release workflow when a
 To build the same artifacts locally:
 
 ```sh
-scripts/release/build-mcp-release.sh --version 0.1.0 --output dist
+for platform in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64; do
+  make dist TIMICH_MCP_VERSION=0.1.0 DIST_OS="${platform%/*}" DIST_ARCH="${platform#*/}"
+done
 ```
