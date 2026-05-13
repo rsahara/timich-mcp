@@ -6,6 +6,10 @@ videos through a paired Timich Agent on your LAN.
 It does not connect to Immich directly. Timich Agent stays near your Immich
 server, and `timich-mcp` runs on the machine where your MCP client runs.
 
+Install and run [`timich-agent`](https://github.com/rsahara/timich-agent) on
+the home server, NAS, or computer that can reach Immich, then pair this MCP
+adapter with that Agent.
+
 ## What It Does
 
 - Pairs with Timich Agent using the normal Agent Admin UI pairing code.
