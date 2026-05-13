@@ -77,6 +77,7 @@ dist:
 		'  "goarch": "$(DIST_ARCH)"' \
 		'}' > "$(DIST_STAGE)/BUILDINFO.json"
 	@cp README.md "$(DIST_STAGE)/README.md"
+	@cp LICENSE "$(DIST_STAGE)/LICENSE"
 	@tar -C "build/dist" -czf "$(DIST_ARCHIVE)" "$(DIST_NAME)"
 	@archive_sha="$$(shasum -a 256 "$(DIST_ARCHIVE)" | awk '{print $$1}')" && \
 		printf '%s  %s\n' "$$archive_sha" "$(DIST_NAME).tar.gz" > "$(DIST_ARCHIVE).sha256"
