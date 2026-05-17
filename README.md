@@ -89,8 +89,22 @@ timich-mcp logout
 
 ## Configure Codex MCP
 
-Configure your MCP client to run `timich-mcp serve` over stdio. Use the exact
-path from `command -v timich-mcp` as the `command` value. For example:
+Configure your MCP client to run `timich-mcp serve` over stdio.
+
+If you use Codex and `timich-mcp` is already installed, you can also ask your
+LLM assistant to add the MCP server for you. A prompt like this is usually
+enough:
+
+```text
+I have timich-mcp installed and paired with Timich Agent. Please configure
+Codex MCP to run it as a stdio server. Use `command -v timich-mcp` for the
+absolute command path, name the server `timich`, and run it with `serve`.
+```
+
+The resulting configuration should look like the manual example below.
+
+For manual configuration, use the exact path from `command -v timich-mcp` as
+the `command` value:
 
 ```sh
 command -v timich-mcp
