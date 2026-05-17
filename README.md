@@ -20,10 +20,25 @@ adapter with that Agent.
   - `search_assets`
   - `get_asset_preview`
 
-## Install From A Release
+## Install With Homebrew
 
-Download the `timich-mcp` archive for your platform from GitHub Releases,
-extract it, and put the `timich-mcp` binary somewhere on your `PATH`.
+Homebrew is the recommended install path on macOS and Linux:
+
+```sh
+brew install rsahara/timich/timich-mcp
+```
+
+Then check the binary:
+
+```sh
+timich-mcp version
+```
+
+## Install From A Release Archive
+
+If you do not use Homebrew, download the `timich-mcp` archive for your platform
+from GitHub Releases, extract it, and put the `timich-mcp` binary somewhere on
+your `PATH`.
 
 Then check the binary:
 
@@ -74,13 +89,18 @@ timich-mcp logout
 
 ## Configure Codex MCP
 
-Configure your MCP client to run `timich-mcp serve` over stdio. For example:
+Configure your MCP client to run `timich-mcp serve` over stdio. Use the exact
+path from `command -v timich-mcp` as the `command` value. For example:
+
+```sh
+command -v timich-mcp
+```
 
 ```json
 {
   "mcpServers": {
     "timich": {
-      "command": "/usr/local/bin/timich-mcp",
+      "command": "/absolute/path/to/timich-mcp",
       "args": ["serve"]
     }
   }
@@ -93,7 +113,7 @@ If you want to keep state somewhere else, pass `--state-dir`:
 {
   "mcpServers": {
     "timich": {
-      "command": "/usr/local/bin/timich-mcp",
+      "command": "/absolute/path/to/timich-mcp",
       "args": ["serve", "--state-dir", "/path/to/timich-mcp-state"]
     }
   }
