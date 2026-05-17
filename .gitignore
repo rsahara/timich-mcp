@@ -1,6 +1,5 @@
 .DS_Store
 .env
-.codex/Journal.md
 .local/
 build/
 dist/
