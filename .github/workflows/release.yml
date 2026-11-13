@@ -35,8 +35,11 @@ concurrency:
 
 jobs:
   release:
+    # Temporarily paused: run locally/NAS/AWS to avoid Actions storage.
+    if: ${{ false }}
     name: Build and publish release
-    if: ${{ github.event_name == 'push' || github.ref_name == 'main' }}
+    # Previous job condition (restore when resuming):
+    # if: ${{ github.event_name == 'push' || github.ref_name == 'main' }}
     runs-on: ubuntu-latest
 
     steps:
